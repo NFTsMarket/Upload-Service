@@ -1,47 +1,71 @@
 //App routes  
 module.exports = function (app) {
 
-    var Person = require('../models/user');
+    var User = require('../models/user');
     var Asset = require('../models/asset')
 
-    //Create a new Person and save it  
-    person = function (req, res) {
-        var person = new Person({ name: req.body.name, lastName: req.body.lastName });
-        person.save();
+
+    // ======================== USER ===========================
+    //Create a new User and save it  
+    createUser = function (req, res) {
+        var user = new User({ name: req.body.name, lastName: req.body.lastName });
+        user.save();
         res.end();
     };
 
     //find all people  
-    list = function (req, res) {
-        Person.find(function (err, people) {
+    listUsers = function (req, res) {
+        User.find(function (err, people) {
             res.send(people);
         });
     };
 
-    //find person by id  
-    find = (function (req, res) {
-        Person.findOne({ _id: req.params.id }, function (error, person) {
-            res.send(person);
+    //find user by id  
+    findUser = (function (req, res) {
+        User.findOne({ _id: req.params.id }, function (error, user) {
+            res.send(user);
         })
     });
 
+    // ======================== ASSET ===========================
+
     //Create a new Asset and save it  
-    asset = function (req, res) {
+    createAsset = function (req, res) {
         var asset = new Asset({ file: req.body.file, name: req.body.name, user: req.body.user });
         asset.save();
         res.end();
     };
 
-    //find all people  
-    list = function (req, res) {
+    //find all assets  
+    listAssets = function (req, res) {
         Asset.find(function (err, asset) {
             res.send(asset);
         });
     };
+
+    updateAsset= function(req, res){
+        var filter = { _id: req.params.id };
+        Asset.findOneAndUpdate(filter, req.body, function(err, doc) {
+            if (err) return res.send(500, {error: err});
+            return res.send('Succesfully saved.');
+        });
+    }
+
+    findAsset= function(req, res){
+        var filter = { _id: req.params.id };
+        Asset.findOne(function (err, asset) {
+            if (err) return res.send(500, {error: err});
+            res.send(asset);
+        });
+    }
+    
     //Link routes and functions  
-    app.post('/person', person);
-    app.get('/person', list);
-    app.get('/person/:id', find);
-    app.post('/asset', asset);
-    app.get('/assets', list);
+    app.post('/user', createUser);
+    app.get('/user', listUsers);
+    app.get('/user/:id', findUser);
+
+    app.post('/asset', createAsset);
+    app.get('/assets', listAssets);
+    app.put('/asset/:id', updateAsset);
+    app.get('/assets/:id', findAsset);
 }
