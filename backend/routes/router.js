@@ -78,8 +78,8 @@ module.exports = function (app) {
     app.get('/user/:id', findUser);
 
     app.post('/asset', createAsset);
-    app.get('/assets', listAssets);
+    app.get('/asset', listAssets);
     app.put('/asset/:id', updateAsset);
-    app.get('/assets/:id', findAsset);
-    app.delete('/assets/:id', deleteAsset);
+    app.get('/asset/:id', findAsset);
+    app.delete('/asset/:id', deleteAsset);
 }
