@@ -1,0 +1,137 @@
+openapi: '3.0.2'
+info:
+  title: Upload Service
+  description: Microservicio de subida de imágenes.
+  version: '1.0'
+servers:
+  - url: https://localhost:8000/
+paths:
+  # TODO: Hacer list y post
+  # /asset:
+  #   get:
+  #     summary: "Devuelve el listado de imágenes de la base de datos"
+  #     responses:
+  #       '200':
+  #         description: Todo ha ido correctamente
+  #   post:
+  #     summary: "Añade una nueva imágen a la base de datos"
+  #     responses:
+  #       '200':
+  #         description: Todo ha ido correctamente
+
+  /asset/{id}:
+    get:
+      parameters:
+      - Schema:
+        $ref: "#/components/parameters/paramId"
+      summary: "Devuelve el listado de imágenes de la base de datos"
+      responses:
+        '200':
+          description: Todo ha ido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset"
+        "400":
+          description: "El id de la imagen no es válido"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notValid"
+
+        '404':
+          description: No se ha encontrado la imagen con el id dado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notFound"
+    put:
+      summary: "Actualiza una imágen existente en la base de datos"
+      parameters:
+      - Schema:
+        $ref: "#/components/parameters/paramId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createModifyAsset"
+      responses:
+        '200':
+          description: Todo ha ido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/successfull"
+        "400":
+          description: "El id de la imagen no es válido"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notValid"
+        "404":
+          description: No se ha encontrado la imagen con el id dado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notFound"
+        # "405":
+        #   description: "Validation exception"
+components:
+  parameters:
+    paramId:
+      description: Id de la imagen sobre la que hacer la operación
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/paramId"
+  schemas:
+    paramId:
+      type: string
+      description: Id de la imagen
+    successfull:
+      type: string
+      description: La operación se ha realizado correctamente
+    notFound:
+      type: string
+      description: Imagen no encontrada
+    notValid:
+      type: string
+      description: El id no es válido
+    createModifyAsset:
+      type: object
+      properties:
+        file:
+          type: string
+          description: URL de la imagen almacenada en Google Images
+        name:
+          type: string
+          description: Nombre de la imagen
+        user:
+          type: string
+          description: Usuario al que pertenece la imagen
+    asset:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Id de la imagen almacenado en la BD
+        file:
+          type: string
+          description: URL de la imagen almacenada en Google Images
+        name:
+          type: string
+          description: Nombre de la imagen
+        user:
+          type: string
+          description: Usuario al que pertenece la imagen
+        createdAt:
+          type: string
+          description: Fecha de creación de la imagen en la BD
+        updatedAt:
+          type: string
+          description: Fecha de actualización de la imagen en la BD
+        __v:
+          type: integer
+          description: Versión de la imagen
