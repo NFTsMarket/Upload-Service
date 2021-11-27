@@ -53,9 +53,22 @@ module.exports = function (app) {
 
     findAsset= function(req, res){
         var filter = { _id: req.params.id };
-        Asset.findOne(function (err, asset) {
+        Asset.findOne(filter,function (err, asset) {
             if (err) return res.send(500, {error: err});
             res.send(asset);
+        });
+    }
+    
+    deleteAsset= function(req, res){
+        Asset.findByIdAndDelete(req.params.id,function (err, asset) {
+            if (err){
+                 return res.send(500, {error: err});
+                }
+            else if(asset){
+                res.send("Se ha eliminado el asset correctamente");
+            }else{
+                res.send("No se encontró ningún asset con ese id");
+            }
         });
     }
     
@@ -68,4 +81,5 @@ module.exports = function (app) {
     app.get('/assets', listAssets);
     app.put('/asset/:id', updateAsset);
     app.get('/assets/:id', findAsset);
+    app.delete('/assets/:id', deleteAsset);
 }
