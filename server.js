@@ -1,4 +1,5 @@
 var express = require('express');
+var {StatusCodes} = require('http-status-codes');
 var bodyParser = require('body-parser');
 var Asset = require('./models/asset')
 
@@ -8,15 +9,28 @@ var app = express();
 app.use(bodyParser.json());
 
 // CREAR ASSET
-app.post(BASE_API_PATH + "/asset", (req, res) => {
+app.post(BASE_API_PATH + "/asset", async (req, res) => {
     console.log(Date() + " - POST /asset");
 
     try{
+        if(typeof req.body.file !== 'string' || !req.body.file instanceof String){
+            return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
+        }else if (req.body.file.match(/^ *$/) !== null){
+            return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
+        }else if(typeof req.body.name !== 'string' || !req.body.name instanceof String){
+            return res.status(StatusCodes.BAD_REQUEST).json("Name must be a string.");
+        }else if (req.body.name.match(/^ *$/) !== null){
+            return res.status(StatusCodes.BAD_REQUEST).json("Name can't be whitespace or empty.");
+        }else if(typeof req.body.user !== 'string' || !req.body.user instanceof String){
+            return res.status(StatusCodes.BAD_REQUEST).json("User must be a string.");
+        }else if (req.body.user.match(/^ *$/) !== null){
+            return res.status(StatusCodes.BAD_REQUEST).json("User can't be whitespace or empty.");
+        }
         var asset = new Asset({ file: req.body.file, name: req.body.name, user: req.body.user });
-        asset.save();
-        return res.send('Succesfully saved.');
+        await asset.save();
+        return res.status(StatusCodes.OK).json('Succesfully saved.');
     }catch(e){
-        return res.send(500, {error: err});
+        return res.status(StatusCodes.BAD_REQUEST).json(e.message);
     }
 });
 
