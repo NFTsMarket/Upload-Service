@@ -1,5 +1,6 @@
 var express = require('express');
 var {StatusCodes} = require('http-status-codes');
+var ObjectId = require('mongoose').Types.ObjectId;
 var bodyParser = require('body-parser');
 var Asset = require('./models/asset')
 
@@ -28,9 +29,10 @@ app.post(BASE_API_PATH + "/asset", async (req, res) => {
         }
         var asset = new Asset({ file: req.body.file, name: req.body.name, user: req.body.user });
         await asset.save();
-        return res.status(StatusCodes.OK).json('Succesfully saved.');
+        res.setHeader('Location', '/asset/'+asset._id);
+        return res.status(StatusCodes.CREATED).json(asset);
     }catch(e){
-        return res.status(StatusCodes.BAD_REQUEST).json(e.message);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e);
     }
 });
 
@@ -39,8 +41,8 @@ app.get(BASE_API_PATH + "/asset", (req, res) => {
     console.log(Date() + " - GET /asset");
 
     Asset.find(function (err, asset) {
-        if (err) return res.send(500, {error: err});
-        return res.send(asset);
+        if (err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+        return res.status(StatusCodes.OK).json(asset);
     });
 });
 
@@ -69,15 +71,18 @@ app.get(BASE_API_PATH + "/asset/:id", (req, res) => {
 // BORRAR ASSET
 app.delete(BASE_API_PATH + "/asset/:id", (req, res) => {
     console.log(Date() + " - DELETE /assets/:id");
+    if(!ObjectId.isValid(req.params.id)){
+        return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
+    }
 
     Asset.findByIdAndDelete(req.params.id,function (err, asset) {
         if (err){
-             return res.send(500, {error: err});
+             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
             }
         else if(asset){
-            return res.send("Se ha eliminado el asset correctamente");
+            return res.status(StatusCodes.NO_CONTENT).json();
         }else{
-            return res.send("No se encontró ningún asset con ese id");
+            return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
         }
     });
 });
