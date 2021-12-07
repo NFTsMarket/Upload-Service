@@ -18,6 +18,8 @@ app.post(BASE_API_PATH + "/asset", async (req, res) => {
             return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
         }else if (req.body.file.match(/^ *$/) !== null){
             return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
+        }else if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) !== null){
+            return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
         }else if(typeof req.body.name !== 'string' || !req.body.name instanceof String){
             return res.status(StatusCodes.BAD_REQUEST).json("Name must be a string.");
         }else if (req.body.name.match(/^ *$/) !== null){
@@ -47,14 +49,51 @@ app.get(BASE_API_PATH + "/asset", (req, res) => {
 });
 
 // MODIFICAR ASSET
-app.put(BASE_API_PATH + "/asset/:id", (req, res) => {
+app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
     console.log(Date() + " - UPDATE /asset");
+    try{
+        if(!ObjectId.isValid(req.params.id)){
+            return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
+        }
+        if (req.body.file!==undefined){
+            if(req.body.file.match(/^ *$/) !== null){
+                return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
+            }
+            if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) !== null){
+                return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
+            }
+            if(typeof req.body.file !== 'string' || !req.body.file instanceof String){
+                return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
+            }
+        }
+        if(req.body.name!==undefined){
+            if(req.body.name!==null & typeof req.body.name !== 'string' || !req.body.name instanceof String){
+                return res.status(StatusCodes.BAD_REQUEST).json("Name must be a string.");
+            }
+            if(req.body.name.match(/^ *$/) !== null){
+                return res.status(StatusCodes.BAD_REQUEST).json("Name can't be whitespace or empty.");
+            }
+        }
+        if(req.body.user!==undefined){
+            if(typeof req.body.user !== 'string' || !req.body.user instanceof String){
+                return res.status(StatusCodes.BAD_REQUEST).json("User must be a string.");
+            }
+            if(req.body.user.match(/^ *$/) !== null){
+                return res.status(StatusCodes.BAD_REQUEST).json("User can't be whitespace or empty.");
+            }
+        }
 
-    var filter = { _id: req.params.id };
+        var filter = { _id: req.params.id };
         Asset.findOneAndUpdate(filter, req.body, function(err, doc) {
-            if (err) return res.send(500, {error: err});
-            return res.send('Succesfully saved.');
+            if(doc===undefined || doc===null){
+                return res.status(StatusCodes.NO_CONTENT).json("There is no content");
+            }
         });
+        var asset = await Asset.findOne(filter);
+        return res.status(StatusCodes.OK).json(asset);
+    }catch(e){
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e);
+    }
 });
 
 // OBTENER UN ASSET
