@@ -18,7 +18,7 @@ app.post(BASE_API_PATH + "/asset", async (req, res) => {
             return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
         }else if (req.body.file.match(/^ *$/) !== null){
             return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
-        }else if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) !== null){
+        }else if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
             return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
         }else if(typeof req.body.name !== 'string' || !req.body.name instanceof String){
             return res.status(StatusCodes.BAD_REQUEST).json("Name must be a string.");
@@ -59,7 +59,7 @@ app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
             if(req.body.file.match(/^ *$/) !== null){
                 return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
             }
-            if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) !== null){
+            if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
                 return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
             }
             if(typeof req.body.file !== 'string' || !req.body.file instanceof String){
@@ -85,12 +85,16 @@ app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
 
         var filter = { _id: req.params.id };
         Asset.findOneAndUpdate(filter, req.body, function(err, doc) {
-            if(doc===undefined || doc===null){
-                return res.status(StatusCodes.NO_CONTENT).json("There is no content");
+            if(!doc){
+                return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
             }
         });
         var asset = await Asset.findOne(filter);
-        return res.status(StatusCodes.OK).json(asset);
+        if(asset){
+            return res.status(StatusCodes.OK).json(asset);
+        }else{
+            return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
+        }
     }catch(e){
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e);
     }
@@ -99,11 +103,19 @@ app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
 // OBTENER UN ASSET
 app.get(BASE_API_PATH + "/asset/:id", (req, res) => {
     console.log(Date() + " - GET /assets/:id");
+    if(!ObjectId.isValid(req.params.id)){
+        return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
+    }
 
     var filter = { _id: req.params.id };
     Asset.findOne(filter,function (err, asset) {
-        if (err) return res.send(500, {error: err});
-        return res.send(asset);
+        if (err){
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+        }else if(asset){
+            return res.status(StatusCodes.OK).json(asset);
+        }else{
+            return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
+        }
     });
 });
 
