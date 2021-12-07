@@ -44,29 +44,29 @@ paths:
       parameters:
       - Schema:
         $ref: "#/components/parameters/paramId"
-      summary: "Devuelve la imagen requerida de la base de datos"
+      summary: "Returns the image of the DB"
       responses:
         '200':
-          description: Todo ha ido correctamente
+          description: Everything is OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/asset"
         "400":
-          description: "El id de la imagen no es válido"
+          description: "An asset with that id could not be found, since it's not a valid id"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/notValid"
 
         '404':
-          description: No se ha encontrado la imagen con el id dado
+          description: An asset with that id could not be found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/notFound"
     put:
-      summary: "Actualiza una imágen existente en la base de datos"
+      summary: "Update an existing asset of the DB"
       parameters:
       - Schema:
         $ref: "#/components/parameters/paramId"
@@ -78,25 +78,23 @@ paths:
               $ref: "#/components/schemas/createModifyAsset"
       responses:
         '200':
-          description: Todo ha ido correctamente
+          description: Everything is OK
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/successful"
         "400":
-          description: "El id de la imagen no es válido"
+          description: "An asset with that id could not be found, since it's not a valid id"
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/notValid"
         "404":
-          description: No se ha encontrado la imagen con el id dado
+          description: An asset with that id could not be found
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/notFound"
-        # "405":
-        #   description: "Validation exception"
     delete:
       summary: "Deletes an asset from the database."
       parameters:
@@ -118,7 +116,7 @@ paths:
 components:
   parameters:
     paramId:
-      description: Id de la imagen sobre la que hacer la operación
+      description: Asset's ID
       name: id
       in: path
       required: true
@@ -127,52 +125,52 @@ components:
   schemas:
     paramId:
       type: string
-      description: Id de la imagen
+      description: Asset's ID
     successful:
       type: string
-      description: La operación se ha realizado correctamente
+      description: Everything is OK
     notFound:
       type: string
-      description: Imagen no encontrada
+      description: Asset not found
     notValid:
       type: string
-      description: El id no es válido
+      description: Invalid id
     createModifyAsset:
       type: object
       properties:
         file:
           type: string
-          description: URL de la imagen almacenada en Google Images
+          description: Asset's URL stored in Google Photos
         name:
           type: string
-          description: Nombre de la imagen
+          description: Asset's name
         user:
           type: string
-          description: Usuario al que pertenece la imagen
+          description: User that owns the asset
     asset:
       type: object
       properties:
         _id:
           type: string
-          description: Id de la imagen almacenado en la BD
+          description: Asset's ID
         file:
           type: string
-          description: URL de la imagen almacenada en Google Images
+          description: Asset's URL stored in Google Photos
         name:
           type: string
-          description: Nombre de la imagen
+          description: Asset's name
         user:
           type: string
-          description: Usuario al que pertenece la imagen
+          description: User that owns the asset
         createdAt:
           type: string
-          description: Fecha de creación de la imagen en la BD
+          description: Creation date
         updatedAt:
           type: string
-          description: Fecha de actualización de la imagen en la BD
+          description: Last updated date
         __v:
           type: integer
-          description: Versión de la imagen
+          description: Asset's version
     assets:
       type: array
       items:
@@ -180,22 +178,22 @@ components:
         properties:
           _id:
             type: string
-            description: Id de la imagen almacenado en la BD
+            description: Asset's ID
           file:
             type: string
-            description: URL de la imagen almacenada en Google Images
+            description: Asset's URL stored in Google Photos
           name:
             type: string
-            description: Nombre de la imagen
+            description: Asset's name
           user:
             type: string
-            description: Usuario al que pertenece la imagen
+            description: User that owns the asster
           createdAt:
             type: string
-            description: Fecha de creación de la imagen en la BD
+            description: Creation date
           updatedAt:
             type: string
-            description: Fecha de actualización de la imagen en la BD
+            description: Last updated date
           __v:
             type: integer
-            description: Versión de la imagen
+            description: Asset's version
