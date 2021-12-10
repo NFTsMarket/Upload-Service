@@ -41,8 +41,18 @@ app.post(BASE_API_PATH + "/asset", async (req, res) => {
 // LISTAR ASSETS
 app.get(BASE_API_PATH + "/asset", (req, res) => {
     console.log(Date() + " - GET /asset");
+    let limitatt = (req.query["limit"] != null && !Number.isNaN(req.query["limit"]) ) ? req.query["limit"] : 0;
+    let offset = (req.query["offset"] != null && !Number.isNaN(req.query["offset"]) ) ? req.query["offset"] : 0;
+    let sortatt = (req.query["sort"] != null) ? req.query["sort"] : null;
+    let order = (req.query["order"] != null) ? req.query["order"] : 1;
 
-    Asset.find(function (err, asset) {
+    let filters = req.query;
+    Object.keys(filters).forEach(x => {
+        if (x == "sort" || x == "order" || x == "limit" || x == "offset") {
+            delete filters[x];
+        }
+    });
+    Asset.find(filters, null, { sort: { [sortatt]: order, _id: 1 }, limit: limitatt, skip: offset*limitatt }, function (err, asset) {
         if (err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
         return res.status(StatusCodes.OK).json(asset);
     });
