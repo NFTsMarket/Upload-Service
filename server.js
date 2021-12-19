@@ -148,7 +148,7 @@ app.delete(BASE_API_PATH + "/asset/:id", (req, res) => {
     });
 });
 
-app.get(BASE_API_PATH + "/healthz", (req, res) => {
+app.get("/api/v1/healthz", (req, res) => {
     res.status(StatusCodes.OK);
 });
 
