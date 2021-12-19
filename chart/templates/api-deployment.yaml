@@ -31,15 +31,15 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
-          readinessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 1
-            httpGet:
-              path: /api/v1/healthz
-              port: 8000
-          livenessProbe:
-            initialDelaySeconds: 10
-            periodSeconds: 1
-            httpGet:
-              path: /api/v1/healthz
-              port: 8000
+          # readinessProbe:
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 1
+          #   httpGet:
+          #     path: /api/v1/healthz
+          #     port: 8000
+          # livenessProbe:
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 1
+          #   httpGet:
+          #     path: /api/v1/healthz
+          #     port: 8000
