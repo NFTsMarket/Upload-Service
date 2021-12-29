@@ -61,7 +61,6 @@ app.get(BASE_API_PATH + "/asset", (req, res) => {
         if (err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
         var token=await googlePhotos.get_access_token_using_saved_refresh_token();
         var googlePhotosResponse= await googlePhotos.listAssets(token);
-
         for(asset in assets){
             var googlePhotoInfo=googlePhotosResponse.find(x=> assets[asset].file==x.id); 
             assets[asset]._doc["image"]=googlePhotoInfo;
