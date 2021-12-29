@@ -1,7 +1,7 @@
 openapi: '3.0.2'
 info:
   title: Upload Service
-  description: Microservicio de subida de imágenes.
+  description: Image upload microservice.
   version: '1.0'
 servers:
   - url: https://localhost:8000/
@@ -113,6 +113,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/notFound"
+  /asset/user/{id}:
+    get:
+     parameters:
+        - Schema:
+          $ref: "#/components/parameters/paramUserId"
+     summary: "Returns a list with all the assets of the specified user."
+     responses:
+      '200':
+        description: Everything went OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/assets"
 components:
   parameters:
     paramId:
@@ -122,10 +135,20 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/paramId"
+    paramUserId:
+      description: Asset owner's ID (user field)
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/paramUserId"
   schemas:
     paramId:
       type: string
       description: Asset's ID
+    paramUserId:
+      type: string
+      description: Asset owner's ID (user field)
     successful:
       type: string
       description: Everything is OK

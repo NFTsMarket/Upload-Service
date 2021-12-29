@@ -2,7 +2,11 @@ var express = require('express');
 var {StatusCodes} = require('http-status-codes');
 var ObjectId = require('mongoose').Types.ObjectId;
 var bodyParser = require('body-parser');
-var Asset = require('./models/asset')
+var Asset = require('./models/asset');
+const {
+    authorizedAdmin,
+    authorizedClient,
+  } = require("./middlewares/authorized-roles");
 const googlePhotos= require('./googlePhotos/googlePhotosService')
 var BASE_API_PATH = "/api/v1";
 
@@ -10,7 +14,7 @@ var app = express();
 app.use(bodyParser.json());
 
 // CREAR ASSET
-app.post(BASE_API_PATH + "/asset", async (req, res) => {
+app.post(BASE_API_PATH + "/asset",authorizedClient, async (req, res) => {
     console.log(Date() + " - POST /asset");
 
     try{
@@ -44,7 +48,7 @@ app.post(BASE_API_PATH + "/asset", async (req, res) => {
 });
 
 // LISTAR ASSETS
-app.get(BASE_API_PATH + "/asset", (req, res) => {
+app.get(BASE_API_PATH + "/asset", authorizedClient, (req, res) => {
     console.log(Date() + " - GET /asset");
     let limitatt = (req.query["limit"] != null && !Number.isNaN(req.query["limit"]) ) ? req.query["limit"] : 0;
     let offset = (req.query["offset"] != null && !Number.isNaN(req.query["offset"]) ) ? req.query["offset"] : 0;
@@ -72,7 +76,7 @@ app.get(BASE_API_PATH + "/asset", (req, res) => {
 });
 
 // MODIFICAR ASSET
-app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
+app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
     console.log(Date() + " - UPDATE /asset");
     try{
         if(!ObjectId.isValid(req.params.id)){
@@ -124,7 +128,7 @@ app.put(BASE_API_PATH + "/asset/:id", async (req, res) => {
 });
 
 // OBTENER UN ASSET
-app.get(BASE_API_PATH + "/asset/:id", async (req, res) => {
+app.get(BASE_API_PATH + "/asset/:id", authorizedClient, (req, res) => {
     console.log(Date() + " - GET /assets/:id");
     if(!ObjectId.isValid(req.params.id)){
         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
@@ -145,8 +149,22 @@ app.get(BASE_API_PATH + "/asset/:id", async (req, res) => {
     });
 });
 
+// OBTENER ASSETS DE UN USUARIO (accesible a clientes)
+app.get(BASE_API_PATH + "/asset/user/:user", authorizedClient, (req, res) => {
+    console.log(Date() + " - GET /assets/user/:user");
+
+    var filter = { user: req.params.user };
+    Asset.find(filter,function (err, asset) {
+        if (err){
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+        }else if(asset){
+            return res.status(StatusCodes.OK).json(asset);
+        }
+    });
+});
+
 // BORRAR ASSET
-app.delete(BASE_API_PATH + "/asset/:id", (req, res) => {
+app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, (req, res) => {
     console.log(Date() + " - DELETE /assets/:id");
     if(!ObjectId.isValid(req.params.id)){
         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
