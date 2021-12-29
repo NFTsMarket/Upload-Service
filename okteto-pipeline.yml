@@ -1,0 +1,3 @@
+deploy:
+ - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} .
+ - helm upgrade --install upload-service chart --set tag=${OKTETO_GIT_COMMIT} --set uploadMongoUrl=$ASSETS_MONGO_URL
