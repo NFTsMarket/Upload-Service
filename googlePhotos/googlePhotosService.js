@@ -1,20 +1,19 @@
 const {google} = require('googleapis');
 const Photos = require('googlephotos');
-const config = require('./config.json');
 var fs = require("fs");
 
-const oauth2Client = new google.auth.OAuth2(config.client_id, config.client_secret, config.redirect_uri);
+const oauth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, null);
 
 const scopes = [Photos.Scopes.READ_ONLY, Photos.Scopes.SHARING, Photos.Scopes.APPEND_ONLY];
 const albumId="ALK3iGMnoLmAQVdCEJO9v_9jjhqNpcdmxZd4Jk7CG322R-uyk38uDIxI-irV8rsDxZufi_QB5pqv";
 
 async function get_access_token_using_saved_refresh_token() {
     // from the oauth playground
-    const refresh_token = config.refresh_token;
+    const refresh_token = process.env.REFRESH_TOKEN;
     // from the API console
-    const client_id = config.client_id;
+    const client_id = process.env.CLIENT_ID;
     // from the API console
-    const client_secret = config.client_secret;
+    const client_secret = process.env.CLIENT_SECRET;
     // from https://developers.google.com/identity/protocols/OAuth2WebServer#offline
     const refresh_url = "https://www.googleapis.com/oauth2/v4/token";
 
