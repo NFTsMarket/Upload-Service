@@ -7,7 +7,6 @@ services:
       - "8001:8000"
     environment:
       - MONGO_HOSTNAME=mongodb
-      - test=${REFRESH_TOKEN}
     volumes:
       - .:/app
       - /app/node_modules
