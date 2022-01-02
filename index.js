@@ -5,6 +5,7 @@ dotenv.config();
 var port = (process.env.PORT || 8000);
 
 console.log("Starting API server at "+port);
+console.log(process.env.SECRET_KEY);
 
 dbConnect().then(
     () => {
