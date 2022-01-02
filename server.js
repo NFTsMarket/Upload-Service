@@ -48,7 +48,7 @@ app.post(BASE_API_PATH + "/asset",authorizedClient, async (req, res) => {
 });
 
 // LISTAR ASSETS
-app.get(BASE_API_PATH + "/asset", authorizedClient, (req, res) => {
+app.get(BASE_API_PATH + "/asset", authorizedAdmin, (req, res) => {
     console.log(Date() + " - GET /asset");
     let limitatt = (req.query["limit"] != null && !Number.isNaN(req.query["limit"]) ) ? req.query["limit"] : 0;
     let offset = (req.query["offset"] != null && !Number.isNaN(req.query["offset"]) ) ? req.query["offset"] : 0;
