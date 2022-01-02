@@ -11,6 +11,5 @@ deploy:
  - echo "CLIENT_SECRET=$CLIENT_SECRET" | tee -a .env
  - echo "REFRESH_TOKEN=$REFRESH_TOKEN" | tee -a .env
  - echo "SAMPLE_JWT=$SAMPLE_JWT" | tee -a .env
- - while read line; do echo $line; done < .env
  - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} .
  - helm upgrade --install upload-service chart --set tag=${OKTETO_GIT_COMMIT} --set uploadMongoUrl=$ASSETS_MONGO_URL
