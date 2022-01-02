@@ -1,7 +1,8 @@
 deploy:
+ - export SECRET_KEY=$SECRET_KEY
+ - cat > .env
+ - echo "$SECRET_KEY"
+ - ls -a
+ - envsubst "$SECRET_KEY" <.env > .env.example
  - okteto build -t okteto.dev/api:${OKTETO_GIT_COMMIT} .
  - helm upgrade --install upload-service chart --set tag=${OKTETO_GIT_COMMIT} --set uploadMongoUrl=$ASSETS_MONGO_URL
- - export SECRET_KEY=$SECRET_KEY
- - ls
- - cat > .env
- - envsubst "$SECRET_KEY" <.env > .env.example
