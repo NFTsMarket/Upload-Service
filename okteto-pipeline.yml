@@ -1,6 +1,6 @@
 deploy:
  - SECRET_KEY=$SECRET_KEY
- - touch > .env
+ - cat > .env
  - ls -a
  - echo "SECRET_KEY=$SECRET_KEY" | tee .env
  - while read line; do echo $line; done < .env
