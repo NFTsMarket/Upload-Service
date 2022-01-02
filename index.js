@@ -15,6 +15,17 @@ filenames.forEach((file) => {
 console.log("Starting API server at "+port);
 console.log(process.env.SECRET_KEY);
 
+fs.readFile("myFile.txt", (err, buff) => {
+    // if any error
+    if (err) {
+      console.error(err);
+      return;
+    }
+  
+    // otherwise log contents
+    console.log(buff.toString());
+  });
+
 dbConnect().then(
     () => {
         app.listen(port);
