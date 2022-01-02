@@ -26,7 +26,7 @@ const authorizedAdmin = function (req, res, next) {
     next();
   } catch (e) {
     return res.status(401).json({
-      msg: "The provided JWT is malformed",
+      e
     });
   }
 };
