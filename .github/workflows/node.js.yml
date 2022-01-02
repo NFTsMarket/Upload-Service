@@ -22,7 +22,7 @@ jobs:
         envkey_CLIENT_ID: ${{ secrets.CLIENT_ID}}
         envkey_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET}}
         envkey_REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN}}
-        directory: /
+        directory: ./
   build:
     needs: create-envfile
     runs-on: ubuntu-latest
