@@ -35,11 +35,11 @@ app.post(BASE_API_PATH + "/asset",authorizedClient, async (req, res) => {
         }
         var token=await googlePhotos.get_access_token_using_saved_refresh_token();
         var googlePhotosResponse= await googlePhotos.createAsset(token,req.body);
-        var asset = new Asset({ 
+        var asset = { 
             file: googlePhotosResponse.newMediaItemResults[0].mediaItem.id, 
             name: req.body.name, 
-            user: req.body.user });
-        await asset.save();
+            user: req.body.user };
+        var asset=await Asset.create(asset);
         res.setHeader('Location', '/asset/'+asset._id);
         return res.status(StatusCodes.CREATED).json(asset);
     }catch(e){
@@ -48,7 +48,7 @@ app.post(BASE_API_PATH + "/asset",authorizedClient, async (req, res) => {
 });
 
 // LISTAR ASSETS
-app.get(BASE_API_PATH + "/asset", authorizedClient, (req, res) => {
+app.get(BASE_API_PATH + "/asset", authorizedAdmin, (req, res) => {
     console.log(Date() + " - GET /asset");
     let limitatt = (req.query["limit"] != null && !Number.isNaN(req.query["limit"]) ) ? req.query["limit"] : 0;
     let offset = (req.query["offset"] != null && !Number.isNaN(req.query["offset"]) ) ? req.query["offset"] : 0;
@@ -82,15 +82,15 @@ app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
             return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
         }
         if (req.body.file!==undefined){
-            if(req.body.file.match(/^ *$/) !== null){
-                return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
-            }
-            if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
-                return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
-            }
             if(typeof req.body.file !== 'string' || !req.body.file instanceof String){
                 return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
             }
+            if(req.body.file.match(/^ *$/) !== null){
+                return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
+            }
+            // if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
+            //     return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
+            // }
         }
         if(req.body.name!==undefined){
             if(req.body.name!==null & typeof req.body.name !== 'string' || !req.body.name instanceof String){
