@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\""
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -22,5 +22,10 @@
     "method-override": "^3.0.0",
     "mongodb": "^4.2.0",
     "mongoose": "^6.0.13"
+  },
+  "devDependencies": {
+    "jest": "^27.4.5",
+    "jest-extended": "^1.2.0",
+    "supertest": "^6.1.6"
   }
 }
