@@ -9,12 +9,15 @@ const {
   } = require("./middlewares/authorized-roles");
 const googlePhotos= require('./googlePhotos/googlePhotosService')
 var BASE_API_PATH = "/api/v1";
+const { sendMessageCreatedAsset, sendMessageUpdateAsset,sendMessageDeleteAsset } = require("./controllers/serverController.js");
 
 var app = express();
 app.use(bodyParser.json());
 
 // CREAR ASSET
-app.post(BASE_API_PATH + "/asset",authorizedClient, async (req, res) => {
+app.post(BASE_API_PATH + "/asset",[authorizedClient],
+//sendMessageCreatedAsset, 
+async (req, res) => {
     console.log(Date() + " - POST /asset");
 
     try{
@@ -75,7 +78,9 @@ app.get(BASE_API_PATH + "/asset", authorizedAdmin, (req, res) => {
 });
 
 // MODIFICAR ASSET
-app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
+app.put(BASE_API_PATH + "/asset/:id", authorizedClient, 
+//sendMessageUpdateAsset, 
+async (req, res) => {
     console.log(Date() + " - UPDATE /asset");
     try{
         if(!ObjectId.isValid(req.params.id)){
@@ -163,7 +168,9 @@ app.get(BASE_API_PATH + "/asset/user/:user", authorizedClient, (req, res) => {
 });
 
 // BORRAR ASSET
-app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, (req, res) => {
+app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, 
+//sendMessageDeleteAsset, 
+(req, res) => {
     console.log(Date() + " - DELETE /assets/:id");
     if(!ObjectId.isValid(req.params.id)){
         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
