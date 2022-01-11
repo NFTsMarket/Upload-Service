@@ -4,6 +4,7 @@ var Asset = require('../models/asset.js');
 const googlePhotos= require('../googlePhotos/googlePhotosService');
 const authorizeToken= require("../middlewares/authorized-roles");
 var ObjectId = require('mongoose').Types.ObjectId;
+const serverController = require("../controllers/serverController");
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -97,12 +98,17 @@ describe("Upload service API", ()=>{
             dbCreatreAsset.mockImplementation( (query)=>{
                 return googleAsset;
             });
-    
-            
+
+            var sendMessageCreatedAsset=jest.spyOn(serverController,"sendMessageCreatedAsset");
+            sendMessageCreatedAsset.mockImplementation( (query)=>{
+                return true;
+            });
+     
             dbInsert = jest.spyOn(Asset, "create");
         });
 
         it('Should add a new asset if everything is fine', () => {
+            
             dbInsert.mockImplementation(() => {
                 return {
                     "file": "ALK3iGPxgKrOIwdlgn4SE8_iCTZ-gHoX9sVVY8QhCcgvzGmstAp-CVC81K7_pPU8f1M80AiJc8aKgZj_gvCVxkLAf4TxPXDRYQ",
@@ -244,6 +250,11 @@ describe("Upload service API", ()=>{
             dbFind = jest.spyOn(Asset, "findOne");
 
             validId= jest.spyOn(ObjectId,"isValid");
+
+            var sendMessageUpdateAsset=jest.spyOn(serverController,"sendMessageUpdateAsset");
+            sendMessageUpdateAsset.mockImplementation( (query)=>{
+                return true;
+            });
 
         });
 
@@ -650,6 +661,11 @@ describe("Upload service API", ()=>{
 
             dbFind.mockImplementation((query, callback)=>{
                 callback(null, true)
+            });
+
+            var sendMessageDeleteAsset=jest.spyOn(serverController,"sendMessageDeleteAsset");
+            sendMessageDeleteAsset.mockImplementation( (query)=>{
+                return true;
             });
         
         });
