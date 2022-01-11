@@ -9,15 +9,13 @@ const {
   } = require("./middlewares/authorized-roles");
 const googlePhotos= require('./googlePhotos/googlePhotosService')
 var BASE_API_PATH = "/api/v1";
-const { sendMessageCreatedAsset, sendMessageUpdateAsset,sendMessageDeleteAsset } = require("./controllers/serverController.js");
+const pubSubController = require("./controllers/serverController.js");
 
 var app = express();
 app.use(bodyParser.json());
 
 // CREAR ASSET
-app.post(BASE_API_PATH + "/asset",[authorizedClient],
-//sendMessageCreatedAsset, 
-async (req, res) => {
+app.post(BASE_API_PATH + "/asset",[authorizedClient], async (req, res) => {
     console.log(Date() + " - POST /asset");
 
     try{
@@ -44,6 +42,7 @@ async (req, res) => {
             user: req.body.user };
         var asset=await Asset.create(asset);
         res.setHeader('Location', '/asset/'+asset._id);
+        await pubSubController.sendMessageCreatedAsset(req);
         return res.status(StatusCodes.CREATED).json(asset);
     }catch(e){
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(e);
@@ -78,9 +77,7 @@ app.get(BASE_API_PATH + "/asset", authorizedAdmin, (req, res) => {
 });
 
 // MODIFICAR ASSET
-app.put(BASE_API_PATH + "/asset/:id", authorizedClient, 
-//sendMessageUpdateAsset, 
-async (req, res) => {
+app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
     console.log(Date() + " - UPDATE /asset");
     try{
         if(!ObjectId.isValid(req.params.id)){
@@ -122,6 +119,7 @@ async (req, res) => {
         });
         var asset = await Asset.findOne(filter);
         if(asset){
+            await pubSubController.sendMessageUpdateAsset(req);
             return res.status(StatusCodes.OK).json(asset);
         }else{
             return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
@@ -168,19 +166,18 @@ app.get(BASE_API_PATH + "/asset/user/:user", authorizedClient, (req, res) => {
 });
 
 // BORRAR ASSET
-app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, 
-//sendMessageDeleteAsset, 
-(req, res) => {
+app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
     console.log(Date() + " - DELETE /assets/:id");
     if(!ObjectId.isValid(req.params.id)){
         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found, since it's not a valid id.");
     }
 
-    Asset.findByIdAndDelete(req.params.id,function (err, asset) {
+    Asset.findByIdAndDelete(req.params.id,async function (err, asset) {
         if (err){
              return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
             }
         else if(asset){
+            await pubSubController.sendMessageDeleteAsset(req);
             return res.status(StatusCodes.NO_CONTENT).json();
         }else{
             return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");

@@ -8,7 +8,6 @@ var port = (process.env.PORT || 8000);
 
 
 const subscriptions = new Subscriptions();
-subscriptions.initialize();
 subscriptions.execute();
 
 dbConnect().then(

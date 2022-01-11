@@ -1,11 +1,11 @@
 const { response } = require("express");
 const { publishPubSubMessage } = require("../models/pubsub");
 
-const sendMessageCreatedAsset = async (req, res = response) => {
+async function sendMessageCreatedAsset (req) {
   try {
     const data = req.body;
 
-    throw error("Prueba");
+    // throw error("Prueba");
     await publishPubSubMessage("created-asset", data);
 
     console.log("Message sent to PubSub");
@@ -15,7 +15,7 @@ const sendMessageCreatedAsset = async (req, res = response) => {
   }
 };
 
-const sendMessageUpdateAsset = async (req, res = response) => {
+async function sendMessageUpdateAsset(req) {
   try {
     const data = req.body;
 
@@ -28,7 +28,7 @@ const sendMessageUpdateAsset = async (req, res = response) => {
   }
 };
 
-const sendMessageDeleteAsset = async (req, res = response) => {
+async function sendMessageDeleteAsset (req) {
   try {
     const data = req.body;
 

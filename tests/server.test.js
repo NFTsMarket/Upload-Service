@@ -98,16 +98,16 @@ describe("Upload service API", ()=>{
             dbCreatreAsset.mockImplementation( (query)=>{
                 return googleAsset;
             });
+
+            var sendMessageCreatedAsset=jest.spyOn(serverController,"sendMessageCreatedAsset");
+            sendMessageCreatedAsset.mockImplementation( (query)=>{
+                return true;
+            });
      
             dbInsert = jest.spyOn(Asset, "create");
         });
 
         it('Should add a new asset if everything is fine', () => {
-
-            // var sendMessageCreatedAsset=jest.spyOn(serverController,"sendMessageCreatedAsset");
-            // sendMessageCreatedAsset.mockImplementation( (query)=>{
-            //     return true;
-            // });
             
             dbInsert.mockImplementation(() => {
                 return {
@@ -250,6 +250,11 @@ describe("Upload service API", ()=>{
             dbFind = jest.spyOn(Asset, "findOne");
 
             validId= jest.spyOn(ObjectId,"isValid");
+
+            var sendMessageUpdateAsset=jest.spyOn(serverController,"sendMessageUpdateAsset");
+            sendMessageUpdateAsset.mockImplementation( (query)=>{
+                return true;
+            });
 
         });
 
@@ -656,6 +661,11 @@ describe("Upload service API", ()=>{
 
             dbFind.mockImplementation((query, callback)=>{
                 callback(null, true)
+            });
+
+            var sendMessageDeleteAsset=jest.spyOn(serverController,"sendMessageDeleteAsset");
+            sendMessageDeleteAsset.mockImplementation( (query)=>{
+                return true;
             });
         
         });

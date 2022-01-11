@@ -1,5 +1,7 @@
 const { PubSub } = require("@google-cloud/pubsub");
 const { createSubscription } = require("./pubsub");
+var User = require('./user');
+
 
 class Subscriptions {
   constructor() {
@@ -13,44 +15,62 @@ class Subscriptions {
   }
 
   initialize() {
+      createSubscription("created-user", "upload-service").catch(console.error);
   }
 
   execute() {
      // On Created user
-     this.PubSub
-     .subscription("asset-created-user")
-     .on("message", (message) => {
+     this.pubsub
+     .subscription("upload-created-user")
+     .on("message", async (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
-         // const { your_variables } = JSON.parse(message.data.toString());
+         const user = JSON.parse(message.data.toString());
          
-         // Specify how to use the message
+        try{
+          await User.create(user);
+        }catch(e){
+          throw new Error(e);
+        }
 
          message.ack();
      });
 
      // On Updated user
-     this.PubSub
-     .subscription("asset-updated-user")
+     this.pubsub
+     .subscription("upload-updated-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
-         // const { your_variables } = JSON.parse(message.data.toString());
+         const {id, ...body} = JSON.parse(message.data.toString());
 
-         // Specify how to use the message
-
+         var filter = { _id: id };
+         User.findOneAndUpdate(filter, body, function(err, doc) {
+          if(!doc){
+              return Error("An asset with that id could not be found.");
+          }
+        });
          message.ack();
      });
 
      // On Deleted user
-     this.PubSub
-     .subscription("asset-deleted-user")
+     this.pubsub
+     .subscription("upload-deleted-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
-         // const { your_variables } = JSON.parse(message.data.toString());
+         const { id } = JSON.parse(message.data.toString());
 
-         // Specify how to use the message
+         Asset.findByIdAndDelete(id,async function (err, asset) {
+          if (err){
+               return Error("Internal server error");
+              }
+          else if(asset){
+              await pubSubController.sendMessageDeleteAsset(req);
+          }else{
+              return Error("An asset with that id could not be found.");
+          }
+      });
 
          message.ack();
      });
