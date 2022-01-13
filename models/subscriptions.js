@@ -30,7 +30,7 @@ class Subscriptions {
         try{
           await User.create(user);
         }catch(e){
-          throw new Error(e);
+          console.log(e);
         }
 
          message.ack();
@@ -47,7 +47,7 @@ class Subscriptions {
          var filter = { _id: id };
          User.findOneAndUpdate(filter, body, function(err, doc) {
           if(!doc){
-              return Error("An asset with that id could not be found.");
+              console.log("An asset with that id could not be found.");
           }
         });
          message.ack();
@@ -63,12 +63,12 @@ class Subscriptions {
 
          Asset.findByIdAndDelete(id,async function (err, asset) {
           if (err){
-               return Error("Internal server error");
+               console.log("Internal server error");
               }
           else if(asset){
               await pubSubController.sendMessageDeleteAsset(req);
           }else{
-              return Error("An asset with that id could not be found.");
+              console.log("An asset with that id could not be found.");
           }
       });
 

@@ -15,6 +15,19 @@ const pubSubController = require("./controllers/serverController.js");
 
 var app = express();
 app.use(bodyParser.json());
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    next();
+  });
+
+app.get("/", (req, res) => {
+    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.0.0");
+});
+
+app.get(BASE_API_PATH + "/", (req, res) => {
+    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.0.0");
+});
 
 // CREAR ASSET
 app.post(BASE_API_PATH + "/asset", [authorizedClient], async (req, res) => {
