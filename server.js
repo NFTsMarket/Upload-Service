@@ -21,6 +21,7 @@ app.use(function(req, res, next) {
     next();
   });
 
+//BORRAR
 app.post(BASE_API_PATH + "/user", async(req, res) => {
     var user = {
         name: req.body.name,
