@@ -175,9 +175,12 @@ app.get(BASE_API_PATH + "/asset/:id", authorizedClient, (req, res) => {
         if (err) {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
         } else if (asset) {
+            var filter2 = { id: asset.user };
+            var user = await User.find(filter2);
             var token = await googlePhotos.get_access_token_using_saved_refresh_token();
             var googlePhotosResponse = await googlePhotos.getAsset(token, asset.file);
             asset._doc["image"] = googlePhotosResponse;
+            asset._doc["user"] = user;
             return res.status(StatusCodes.OK).json(asset);
         } else {
             return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
