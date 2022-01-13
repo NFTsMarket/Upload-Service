@@ -1,6 +1,7 @@
 const app= require("../server.js");
 const request= require("supertest");
 var Asset = require('../models/asset.js');
+var User = require('../models/user.js');
 const googlePhotos= require('../googlePhotos/googlePhotosService');
 const authorizeToken= require("../middlewares/authorized-roles");
 var ObjectId = require('mongoose').Types.ObjectId;
@@ -102,6 +103,19 @@ describe("Upload service API", ()=>{
             var sendMessageCreatedAsset=jest.spyOn(serverController,"sendMessageCreatedAsset");
             sendMessageCreatedAsset.mockImplementation( (query)=>{
                 return true;
+            });
+
+            var user=[{
+                id:"id1",
+                name:"User1",
+                email:"user1@example.com",
+                profilePicture: null,
+                deleted:false
+            }]
+
+            var dbUserFind=jest.spyOn(User,"find");
+            dbUserFind.mockImplementation( ()=>{
+                return user;
             });
      
             dbInsert = jest.spyOn(Asset, "create");
@@ -254,6 +268,19 @@ describe("Upload service API", ()=>{
             var sendMessageUpdateAsset=jest.spyOn(serverController,"sendMessageUpdateAsset");
             sendMessageUpdateAsset.mockImplementation( (query)=>{
                 return true;
+            });
+
+            var user=[{
+                id:"id1",
+                name:"User1",
+                email:"user1@example.com",
+                profilePicture: null,
+                deleted:false
+            }]
+
+            var dbUserFind=jest.spyOn(User,"find");
+            dbUserFind.mockImplementation( ()=>{
+                return user;
             });
 
         });
@@ -512,6 +539,19 @@ describe("Upload service API", ()=>{
                 return googleAsset;
             });
 
+            var user=[{
+                id:"id1",
+                name:"User1",
+                email:"user1@example.com",
+                profilePicture: null,
+                deleted:false
+            }]
+
+            var dbUserFind=jest.spyOn(User,"find");
+            dbUserFind.mockImplementation( ()=>{
+                return user;
+            });
+
         });
 
 
@@ -565,84 +605,6 @@ describe("Upload service API", ()=>{
             });
             
            return request(app).get("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-                expect(response.statusCode).toBe(500);
-            })
-        });
-    })
-
-    describe("GET /asset/user/:user", ()=>{
-
-        var validId;
-        var dbFind;
-        var dbGetAccessToken;
-        var dbGetAsset;
-
-        beforeAll(()=>{
-
-            const asset=[{_doc:{_id:"61d19b24c6fd0e9a4357dfcf",file:"file1", name: "Archivo1", user: "Usuario1"}}];
-
-            // validId=jest.spyOn(ObjectId,"isValid");
-
-            dbFind=jest.spyOn(Asset,"find");
-
-            dbFind.mockImplementation((query, callback)=>{
-                callback(null, asset)
-            });
-        
-            // var googleAsset={id:"file1", url: "http://www.google.com"};
-            // dbGetAccessToken=jest.spyOn(googlePhotos,"get_access_token_using_saved_refresh_token");
-            // dbGetAsset=jest.spyOn(googlePhotos,"getAsset");
-            // dbGetAccessToken.mockImplementation(()=>{
-            //     return "AuthenticationToken";
-            // });
-            // dbGetAsset.mockImplementation( ()=>{
-            //     return googleAsset;
-            // });
-
-        });
-
-        // it("Should return 404 if id is not valid", () =>{
-
-        //     validId.mockImplementation(() => {
-        //         return false
-        //     });
-            
-        //    return request(app).get("/api/v1/asset/user/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-        //        expect(response.statusCode).toBe(404);
-        //        expect(response.body).toBe("An asset with that id could not be found, since it's not a valid id.");
-        //    })
-        // });
-
-        it("Should return list of asset of user", () =>{
-            
-           return request(app).get("/api/v1/asset/user/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-                expect(response.statusCode).toBe(200);
-           })
-        });
-
-        // it("Should return 404 if asset is not found", () =>{
-
-        //     validId.mockImplementation(() => {
-        //         return true
-        //     });
-
-        //     dbFind.mockImplementation((query, callback)=>{
-        //         callback(null, null)
-        //     });
-            
-        //    return request(app).get("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-        //         expect(response.statusCode).toBe(404);
-        //         expect(response.body).toBe("An asset with that id could not be found.");
-        //     })
-        // });
-
-        it("Should return 500 if there is a problem with the db", () =>{
-
-            dbFind.mockImplementation((query, callback)=>{
-                callback(true, null)
-            });
-            
-           return request(app).get("/api/v1/asset/user/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
                 expect(response.statusCode).toBe(500);
             })
         });
