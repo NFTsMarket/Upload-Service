@@ -64,4 +64,4 @@ jobs:
       uses: okteto/pipeline@latest
       with:
         name: upload-service
-        namespace: juaferfer11
+        namespace: reyblacua
