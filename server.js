@@ -14,7 +14,7 @@ var BASE_API_PATH = "/api/v1";
 const pubSubController = require("./controllers/serverController.js");
 
 var app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
@@ -63,16 +63,17 @@ app.post(BASE_API_PATH + "/asset", [authorizedClient], async (req, res) => {
 
             if (user[0].id == payload.id || payload.role == "admin") {
                 var token = await googlePhotos.get_access_token_using_saved_refresh_token();
-                var googlePhotosResponse = await googlePhotos.createAsset(token, req.body);
-                var asset = {
-                    file: googlePhotosResponse.newMediaItemResults[0].mediaItem.id,
-                    name: req.body.name,
-                    user: req.body.user
-                };
-                var asset = await Asset.create(asset);
-                res.setHeader('Location', '/asset/' + asset._id);
-                await pubSubController.sendMessageCreatedAsset(req);
-                return res.status(StatusCodes.CREATED).json(asset);
+                await googlePhotos.createAsset(token, req.body, async function(googlePhotosResponse,err){
+                    var asset = {
+                        file: googlePhotosResponse.newMediaItemResults[0].mediaItem.id,
+                        name: req.body.name,
+                        user: req.body.user
+                    };
+                    var asset = await Asset.create(asset);
+                    res.setHeader('Location', '/asset/' + asset._id);
+                    await pubSubController.sendMessageCreatedAsset(req);
+                    return res.status(StatusCodes.CREATED).json(asset);
+                });
             } else {
                 return res.status(StatusCodes.UNAUTHORIZED).json("The user is not the owner of the asset.");
             }

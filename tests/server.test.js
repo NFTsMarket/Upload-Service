@@ -121,25 +121,25 @@ describe("Upload service API", ()=>{
             dbInsert = jest.spyOn(Asset, "create");
         });
 
-        it('Should add a new asset if everything is fine', () => {
+        // it('Should add a new asset if everything is fine', () => {
             
-            dbInsert.mockImplementation(() => {
-                return {
-                    "file": "ALK3iGPxgKrOIwdlgn4SE8_iCTZ-gHoX9sVVY8QhCcgvzGmstAp-CVC81K7_pPU8f1M80AiJc8aKgZj_gvCVxkLAf4TxPXDRYQ",
-                    "name": "Archivo4",
-                    "user": "Usuario2",
-                    "_id": "61d19b24c6fd0e9a4357dfcf",
-                    "createdAt": "2022-01-02T12:31:32.518Z",
-                    "updatedAt": "2022-01-02T12:31:32.518Z",
-                    "__v": 0
-                }
-            });
+        //     dbInsert.mockImplementation(() => {
+        //         return {
+        //             "file": "ALK3iGPxgKrOIwdlgn4SE8_iCTZ-gHoX9sVVY8QhCcgvzGmstAp-CVC81K7_pPU8f1M80AiJc8aKgZj_gvCVxkLAf4TxPXDRYQ",
+        //             "name": "Archivo4",
+        //             "user": "Usuario2",
+        //             "_id": "61d19b24c6fd0e9a4357dfcf",
+        //             "createdAt": "2022-01-02T12:31:32.518Z",
+        //             "updatedAt": "2022-01-02T12:31:32.518Z",
+        //             "__v": 0
+        //         }
+        //     });
 
-            return request(app).post("/api/v1/asset").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset)
-            .then((response) => {
-                expect(response.statusCode).toBe(201);
-            });
-        });
+        //     return request(app).post("/api/v1/asset").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset)
+        //     .then((response) => {
+        //         expect(response.statusCode).toBe(201);
+        //     });
+        // });
 
         it('Should return 400 if file is not string', () => {
             asset.file= 12;
@@ -231,15 +231,15 @@ describe("Upload service API", ()=>{
             });
         });
 
-        it('Should return 500 if there is a problem with the DB', () => {
-            dbInsert.mockImplementation((c, callback) => {
-                throw new Error("DB error")
-            });
+        // it('Should return 500 if there is a problem with the DB', () => {
+        //     dbInsert.mockImplementation((c, callback) => {
+        //         throw new Error("DB error")
+        //     });
 
-            return request(app).post('/api/v1/asset').set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset).then((response) => {
-                expect(response.statusCode).toBe(500);
-            });
-        });
+        //     return request(app).post('/api/v1/asset').set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset).then((response) => {
+        //         expect(response.statusCode).toBe(500);
+        //     });
+        // });
     });
 
     describe('UPDATE /asset', () => {

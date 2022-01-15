@@ -1,7 +1,6 @@
 const {google} = require('googleapis');
 const Photos = require('googlephotos');
-var fs = require("fs");
-
+const request = require('request');
 const oauth2Client = new google.auth.OAuth2(process.env.CLIENT_ID, process.env.CLIENT_SECRET, null);
 
 const scopes = [Photos.Scopes.READ_ONLY, Photos.Scopes.SHARING, Photos.Scopes.APPEND_ONLY];
@@ -44,12 +43,56 @@ async function listAssets (access_token) {
     return response.mediaItems;
 }
 
-async function createAsset (access_token,body) {
-    const photos = new Photos(access_token);
-    
-    const response = await photos.mediaItems.upload(albumId, body.name, body.file, body.name);
+function treatFile(file){
+    let base64Image=file.split(';base64,').pop();
+    var buf = Buffer.from(base64Image, 'base64');
+    return buf;
+}
 
-    return response;
+async function createAsset (access_token,body, cb) {
+    const photos = new Photos(access_token);
+    var buf=treatFile(body.file);
+    request({
+    method: 'post',
+    headers: {
+    'content-type' : 'application/octet-stream',
+    'Authorization': `Bearer ${access_token}`,
+    'X-Goog-Upload-File-Name' :  'prueba.jpg',
+    'X-Goog-Upload-Protocol' : 'raw'
+    },
+    url: `https://photoslibrary.googleapis.com/v1/uploads`,
+    rejectUnauthorized: false,
+    body: buf
+    },async function(err,response,body) {
+        uploadToken=body;
+        let reqObject = {
+            albumId:albumId,
+            newMediaItems: [
+                {
+                    description: "Google photos upload",
+                    simpleMediaItem: {
+                        uploadToken: uploadToken 
+                    }
+                }
+            ]
+            };
+    
+            let reqObjectString = JSON.stringify(reqObject);
+            
+            await request({
+                method: 'post',
+                headers: {
+                'content-type' : 'application/json',
+                'Authorization': `Bearer ${access_token}`,
+                },
+                url: `https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate`,
+                rejectUnauthorized: false,
+                body: reqObjectString
+                }, function(err,response,result) {
+                    if (err) throw Error(err);
+                    cb(JSON.parse(result));
+            });
+        });
 }
 
 async function getAsset (access_token,assetId) {
