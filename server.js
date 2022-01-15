@@ -22,24 +22,12 @@ app.use(function(req, res, next) {
     next();
   });
 
-//BORRAR
-app.post(BASE_API_PATH + "/user", async(req, res) => {
-    var user = {
-        name: req.body.name,
-        email: req.body.email,
-        id: req.body.id,
-        profilePicture: req.body.profilePicture
-    };
-    var asset = await User.create(user);
-    return res.status(StatusCodes.CREATED).json(asset);
-});
-
 app.get("/", (req, res) => {
-    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.0.0");
+    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.2");
 });
 
 app.get(BASE_API_PATH + "/", (req, res) => {
-    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.0.0");
+    res.redirect("https://app.swaggerhub.com/apis-docs/reyblacua/UploadService/1.2");
 });
 
 // CREAR ASSET
