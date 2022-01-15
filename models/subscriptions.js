@@ -23,7 +23,7 @@ class Subscriptions {
   execute() {
      // On Created user
      this.pubsub
-     .subscription("upload2-created-user")
+     .subscription("upload-created-user")
      .on("message", async (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
@@ -40,7 +40,7 @@ class Subscriptions {
 
      // On Updated user
      this.pubsub
-     .subscription("upload2-updated-user")
+     .subscription("upload-updated-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
@@ -57,7 +57,7 @@ class Subscriptions {
 
      // On Deleted user
      this.pubsub
-     .subscription("upload2-deleted-user")
+     .subscription("upload-deleted-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
