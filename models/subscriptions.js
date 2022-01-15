@@ -1,6 +1,8 @@
 const { PubSub } = require("@google-cloud/pubsub");
+const Asset = require("./asset");
 const { createSubscription } = require("./pubsub");
 var User = require('./user');
+var pubSubController = require('../controllers/serverController');
 
 
 class Subscriptions {
@@ -21,7 +23,7 @@ class Subscriptions {
   execute() {
      // On Created user
      this.pubsub
-     .subscription("upload-created-user")
+     .subscription("upload2-created-user")
      .on("message", async (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
@@ -38,7 +40,7 @@ class Subscriptions {
 
      // On Updated user
      this.pubsub
-     .subscription("upload-updated-user")
+     .subscription("upload2-updated-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
@@ -55,20 +57,28 @@ class Subscriptions {
 
      // On Deleted user
      this.pubsub
-     .subscription("upload-deleted-user")
+     .subscription("upload2-deleted-user")
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
          const { id } = JSON.parse(message.data.toString());
-
-         Asset.findByIdAndDelete(id,async function (err, asset) {
+         User.findOneAndDelete({id: id},async function (err, user) {
           if (err){
+               console.log(err);
                console.log("Internal server error");
               }
-          else if(asset){
-              await pubSubController.sendMessageDeleteAsset(req);
+          else if(user){
+              Asset.deleteMany({user: id}, async function(err, doc) {
+                if(doc.deletedCount==0){
+                    console.log("An asset with that user could not be found.");
+                }else{
+                  const deletedAsset = {"id": doc._id};
+                  await pubSubController.sendMessageDeleteAsset(deletedAsset);
+                }
+              });
+              
           }else{
-              console.log("An asset with that id could not be found.");
+              console.log("An user with that id could not be found.");
           }
       });
 
