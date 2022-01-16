@@ -1,12 +1,21 @@
 const { response } = require("express");
 const { publishPubSubMessage } = require("../models/pubsub");
+const googlePhotos = require('../googlePhotos/googlePhotosService')
 
-async function sendMessageCreatedAsset (req) {
+async function sendMessageCreatedAsset (req,googlePhotosResponseId) {
   try {
-    const data = req.body;
+    const data = req;
 
-    // throw error("Prueba");
-    await publishPubSubMessage("created-asset", data);
+    var token = await googlePhotos.get_access_token_using_saved_refresh_token();
+    var googlePhotosResponse = await googlePhotos.getAsset(token, googlePhotosResponseId);
+
+    const asset={
+      id:data._id,
+      name:data.name,
+      user:data.user,
+      file:googlePhotosResponse.baseUrl
+    }
+    await publishPubSubMessage("created-asset", asset);
 
     console.log("Message sent to PubSub");
   } catch (e) {
@@ -17,7 +26,17 @@ async function sendMessageCreatedAsset (req) {
 
 async function sendMessageUpdateAsset(req) {
   try {
-    const data = req.body;
+    const data = req;
+
+    var token = await googlePhotos.get_access_token_using_saved_refresh_token();
+    var googlePhotosResponse = await googlePhotos.getAsset(token, data.file);
+
+    const asset={
+      id:data._id,
+      name:data.name,
+      user:data.user,
+      file:googlePhotosResponse.baseUrl
+    }
 
     await publishPubSubMessage("updated-asset", data);
 
@@ -30,7 +49,7 @@ async function sendMessageUpdateAsset(req) {
 
 async function sendMessageDeleteAsset (req) {
   try {
-    const data = req.body;
+    const data = req;
 
     await publishPubSubMessage("deleted-asset", data);
 
