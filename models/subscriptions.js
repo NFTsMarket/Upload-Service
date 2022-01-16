@@ -29,13 +29,13 @@ class Subscriptions {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
          const user = JSON.parse(message.data.toString());
-         
-        try{
-          await User.create(user);
-        }catch(e){
-          console.log(e);
+        if(user!=null){
+          try{
+            await User.create(user);
+          }catch(e){
+            console.log(e);
+          }
         }
-
          message.ack();
      });
 
@@ -45,14 +45,16 @@ class Subscriptions {
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
-         const {id, ...body} = JSON.parse(message.data.toString());
+         if(message!=null){
+          const {id, ...body} = JSON.parse(message.data.toString());
 
-         var filter = { _id: id };
-         User.findOneAndUpdate(filter, body, function(err, doc) {
-          if(!doc){
-              console.log("An asset with that id could not be found.");
-          }
-        });
+          var filter = { _id: id };
+          User.findOneAndUpdate(filter, body, function(err, doc) {
+            if(!doc){
+                console.log("An asset with that id could not be found.");
+            }
+          });
+        }
          message.ack();
      });
 
@@ -62,30 +64,31 @@ class Subscriptions {
      .on("message", (message) => {
          console.log("Receiving...");
          console.log(JSON.parse(message.data.toString()));
-         const { id } = JSON.parse(message.data.toString());
-         User.findOneAndDelete({id: id},async function (err, user) {
-          if (err){
-               console.log(err);
-               console.log("Internal server error");
-              }
-          else if(user){
-            Asset.find({user: id}, async function(error, assets) {
-              Asset.deleteMany({user: id}, async function(err, doc) {
-                if(doc.deletedCount==0){
-                    console.log("An asset with that user could not be found.");
-                }else{
-                  for (asset in assets){
-                    const deletedAsset = {"id": assets[asset]._id.toString()};
-                    await pubSubController.sendMessageDeleteAsset(deletedAsset);
-                  }
+         if(message!=null){
+          const { id } = JSON.parse(message.data.toString());
+          User.findOneAndDelete({id: id},async function (err, user) {
+            if (err){
+                console.log(err);
+                console.log("Internal server error");
                 }
+            else if(user){
+              Asset.find({user: id}, async function(error, assets) {
+                Asset.deleteMany({user: id}, async function(err, doc) {
+                  if(doc.deletedCount==0){
+                      console.log("An asset with that user could not be found.");
+                  }else{
+                    for (asset in assets){
+                      const deletedAsset = {"id": assets[asset]._id.toString()};
+                      await pubSubController.sendMessageDeleteAsset(deletedAsset);
+                    }
+                  }
+                });
               });
-            });
-          }else{
-              console.log("An user with that id could not be found.");
-          }
-      });
-
+            }else{
+                console.log("An user with that id could not be found.");
+            }
+        });
+       }
          message.ack();
      });
 
@@ -98,19 +101,21 @@ class Subscriptions {
          console.log(JSON.parse(message.data.toString()));
          const product = JSON.parse(message.data.toString());
          
-         const body={
-           user:product.owner
-         }
-        try{
-          var filter = { _id: product.picture };
-          Asset.findOneAndUpdate(filter, body, function (err, doc) {
-            if (!doc) {
-                console.log("An asset with that id could not be found.");
-            }
-        });
-        
-        }catch(e){
-          console.log(e);
+         if(product!=null){
+          const body={
+            user:product.owner
+          }
+          try{
+            var filter = { _id: product.picture };
+            Asset.findOneAndUpdate(filter, body, function (err, doc) {
+              if (!doc) {
+                  console.log("An asset with that id could not be found.");
+              }
+          });
+          
+          }catch(e){
+            console.log(e);
+          }
         }
 
          message.ack();
