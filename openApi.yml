@@ -1,0 +1,344 @@
+openapi: '3.0.2'
+info:
+  title: Upload Service
+  description: Image upload microservice.
+  version: '1.1'
+servers:
+  - url: https://api-reyblacua.cloud.okteto.net/api/v1
+paths:
+
+  /asset:
+     get:
+       summary: "Returns a list with all the assets in the database."
+       responses:
+        '200':
+          description: Everything went OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/assets"
+        "401":
+          description: "The user is not logged or is not authorized to do the action"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notAuthorized"
+     post:
+       summary: "Add a new asset to the database."
+       requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/createModifyAsset"
+       responses:
+         '201':
+           description: "The asset was correctly created. The URI of the new asset is in the Location header."
+           content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/assets"
+         "400":
+            description: "Bad request. One or more input fields are not a string or they are whitespace."
+            content:
+             application/json:
+              schema:
+                $ref: "#/components/schemas/notValid"
+         "401":
+          description: "The user is not logged or is not authorized to do the action"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notAuthorized"
+
+  /asset/{id}:
+    get:
+      parameters:
+      - Schema:
+        $ref: "#/components/parameters/paramId"
+      summary: "Returns the image of the DB"
+      responses:
+        '200':
+          description: Everything is OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/asset"
+        "400":
+          description: "An asset with that id could not be found, since it's not a valid id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notValid"
+
+        '404':
+          description: An asset with that id could not be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notFound"
+
+        "401":
+          description: "The user is not logged or is not authorized to do the action"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notAuthorized"
+    put:
+      summary: "Update an existing asset of the DB"
+      parameters:
+      - Schema:
+        $ref: "#/components/parameters/paramId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/modifyAsset"
+      responses:
+        '200':
+          description: Everything is OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/successful"
+        "400":
+          description: "An asset with that id could not be found, since it's not a valid id"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notValid"
+        "404":
+          description: An asset with that id could not be found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notFound"
+        "401":
+          description: "The user is not logged or is not authorized to do the action"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notAuthorized"
+    delete:
+      summary: "Deletes an asset from the database."
+      parameters:
+      - Schema:
+        $ref: "#/components/parameters/paramId"
+      responses:
+        '204':
+          description: "No content. The asset was correctly deleted."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/successful"
+        "404":
+          description: "Not found. An asset with the specified id could not be found."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notFound"
+        "401":
+          description: "The user is not logged or is not authorized to do the action"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/notAuthorized"
+components:
+  parameters:
+    paramId:
+      description: Asset's ID
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/paramId"
+    paramUserId:
+      description: Asset owner's ID (user field)
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/paramUserId"
+  schemas:
+    paramId:
+      type: string
+      description: Asset's ID
+    paramUserId:
+      type: string
+      description: Asset owner's ID (user field)
+    successful:
+      type: string
+      description: Everything is OK
+    notFound:
+      type: string
+      description: Asset not found
+    notValid:
+      type: string
+      description: Invalid id
+    notAuthorized:
+      type: string
+      description: The user is not authorized
+    createModifyAsset:
+      type: object
+      properties:
+        file:
+          type: string
+          description: Image that the user wants to upload converted to base64
+        name:
+          type: string
+          description: Asset's name
+        user:
+          type: string
+          description: User that owns the asset
+    modifyAsset:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Asset's name
+        user:
+          type: string
+          description: User that owns the asset
+    asset:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Asset's ID
+        file:
+          type: string
+          description: Asset's ID stored in Google Photos
+        image:
+          type: object
+          description: Asset's information stored in Google Photos
+          properties:
+            id:
+              type: string
+              description: Asset's ID stored on Google Photos
+            description:
+              type: string
+              description: Asset's description stored on Google Photos
+            productUrl:
+              type: string
+              description: Asset's private URL stored on Google Photos
+            baseUrl:
+              type: string
+              description: Asset's public URL stored on Google Photos
+            mimeType:
+              type: string
+              description: Asset's mime type stored on Google Photos
+            mediaMetadata:
+              type: object
+              description: Asset's metadata stored on Google Photos
+              properties:
+                creationTime:
+                  type: string
+                  description: Date when the asset was uploaded to Google Photos
+                width:
+                  type: string
+                  description: Asset's width
+                height:
+                  type: string
+                  description: Asset's height
+            filename:
+              type: string
+              description:  Asset's file name stored on Google Photos
+        name:
+          type: string
+          description: Asset's name
+        user:
+          type: object
+          description: User that owns the asset
+          properties:
+            _id:
+              type: string
+              description: User's ID
+            name:
+              type: string
+              description: User's name
+            email:
+              type: string
+              description: User's email
+            profilePicture:
+              type: string
+              description: User's profile picture
+            id:
+              type: string
+              description: User's id from authService
+            deleted:
+              type: boolean
+              description: If user has been deleted
+            __v:
+              type: integer
+              description: Asset's version
+        createdAt:
+          type: string
+          description: Creation date
+        updatedAt:
+          type: string
+          description: Last updated date
+        __v:
+          type: integer
+          description: Asset's version
+    assets:
+      type: array
+      items:
+        type: object
+        properties:
+          _id:
+            type: string
+            description: Asset's ID
+          file:
+            type: string
+            description: Asset's ID stored in Google Photos
+          image:
+            type: object
+            description: Asset's information stored in Google Photos
+            properties:
+              id:
+                type: string
+                description: Asset's ID stored on Google Photos
+              description:
+                type: string
+                description: Asset's description stored on Google Photos
+              productUrl:
+                type: string
+                description: Asset's private URL stored on Google Photos
+              baseUrl:
+                type: string
+                description: Asset's public URL stored on Google Photos
+              mimeType:
+                type: string
+                description: Asset's mime type stored on Google Photos
+              mediaMetadata:
+                type: object
+                description: Asset's metadata stored on Google Photos
+                properties:
+                  creationTime:
+                    type: string
+                    description: Date when the asset was uploaded to Google Photos
+                  width:
+                    type: string
+                    description: Asset's width
+                  height:
+                    type: string
+                    description: Asset's height
+              filename:
+                type: string
+                description:  Asset's file name stored on Google Photos
+          name:
+            type: string
+            description: Asset's name
+          user:
+            type: string
+            description: User that owns the asster
+          createdAt:
+            type: string
+            description: Creation date
+          updatedAt:
+            type: string
+            description: Last updated date
+          __v:
+            type: integer
+            description: Asset's version
