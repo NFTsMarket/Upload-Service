@@ -17,7 +17,7 @@ class Subscriptions {
   }
 
   initialize() {
-      // createSubscription("updated-purchase", "upload-service").catch(console.error);
+      // createSubscription("updated-product", "upload").catch(console.error);
   }
 
   execute() {
@@ -90,28 +90,31 @@ class Subscriptions {
      });
 
       //====================== CATALOG SERVICE =================
-    //  // On changed user
-    //  this.pubsub
-    //  .subscription("upload-updated-purchase")
-    //  .on("message", async (message) => {
-    //      console.log("Receiving...");
-    //      console.log(JSON.parse(message.data.toString()));
-    //      const user = JSON.parse(message.data.toString());
+     // On changed user
+     this.pubsub
+     .subscription("upload-updated-product")
+     .on("message", async (message) => {
+         console.log("Receiving...");
+         console.log(JSON.parse(message.data.toString()));
+         const product = JSON.parse(message.data.toString());
          
-    //     try{
-    //       var filter = { _id: req.params.id };
-    //       Asset.findOneAndUpdate(filter, req.body, function (err, doc) {
-    //         if (!doc) {
-    //             console.log("An asset with that id could not be found.");
-    //         }
-    //     });
+         const body={
+           user:product.owner
+         }
+        try{
+          var filter = { _id: product.picture };
+          Asset.findOneAndUpdate(filter, body, function (err, doc) {
+            if (!doc) {
+                console.log("An asset with that id could not be found.");
+            }
+        });
+        
+        }catch(e){
+          console.log(e);
+        }
 
-    //     }catch(e){
-    //       console.log(e);
-    //     }
-
-    //      message.ack();
-    //  });
+         message.ack();
+     });
   }
 }
 

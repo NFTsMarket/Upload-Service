@@ -39,8 +39,6 @@ app.post(BASE_API_PATH + "/asset", [authorizedClient], async (req, res) => {
             return res.status(StatusCodes.BAD_REQUEST).json("File must be a string.");
         } else if (req.body.file.match(/^ *$/) !== null) {
             return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
-            // }else if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
-            //     return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
         } else if (typeof req.body.name !== 'string' || !req.body.name instanceof String) {
             return res.status(StatusCodes.BAD_REQUEST).json("Name must be a string.");
         } else if (req.body.name.match(/^ *$/) !== null) {
@@ -125,9 +123,6 @@ app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
             if (req.body.file.match(/^ *$/) !== null) {
                 return res.status(StatusCodes.BAD_REQUEST).json("File can't be whitespace or empty.");
             }
-            // if(req.body.file.match(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/) === null){
-            //     return res.status(StatusCodes.BAD_REQUEST).json("The URL is not valid");
-            // }
         }
         if (req.body.name !== undefined) {
             if (req.body.name !== null & typeof req.body.name !== 'string' || !req.body.name instanceof String) {
@@ -161,7 +156,7 @@ app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
                 if(req.body.file){
                     delete req.body["file"];
                 }
-                Asset.findOneAndUpdate(filter, req.body, async function (err, doc) {
+                Asset.findOneAndUpdate(filter, req.body, {new: true}, async function (err, doc) {
                     if (!doc) {
                         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
                     }else{

@@ -38,7 +38,7 @@ async function sendMessageUpdateAsset(req) {
       file:googlePhotosResponse.baseUrl
     }
 
-    await publishPubSubMessage("updated-asset", data);
+    await publishPubSubMessage("updated-asset", asset);
 
     console.log("Message sent to PubSub");
   } catch (e) {
