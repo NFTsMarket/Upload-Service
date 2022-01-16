@@ -10,19 +10,6 @@ const serverController = require("../controllers/serverController");
 const dotenv = require('dotenv');
 dotenv.config();
 
-
-describe("Hello world tests", ()=>{
-
-    it("should do an stupid test", () =>{
-        const a=5;
-        const b=3;
-
-        const  sum=a+b;
-
-        expect(sum).toBe(8);
-    })
-})
-
 describe("Upload service API", ()=>{
 
     beforeAll(()=>{
@@ -384,20 +371,19 @@ describe("Upload service API", ()=>{
             });
         });
 
-        // it('Should return 400 if file is empty', () => {
-        //     asset.file= "";
+        it('Should return 400 if file is empty', () => {
+            asset.file= "";
 
-        //     validId.mockImplementation(() => {
-        //         return true
-        //     });
+            validId.mockImplementation(() => {
+                return true
+            });
             
-        //     return request(app).put("asset/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset)
-        //     .then((response) => {
-        //         console.log(response);
-        //          expect(response.statusCode).toBe(400);
-        //          expect(response.body).toBe("File can't be whitespace or empty.")
-        //     });
-        // });
+            return request(app).put("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).send(asset)
+            .then((response) => {
+                 expect(response.statusCode).toBe(400);
+                 expect(response.body).toBe("File can't be whitespace or empty.")
+            });
+        });
 
         it('Should return 400 if name is not string', () => {
             asset.name= 12;
@@ -620,15 +606,32 @@ describe("Upload service API", ()=>{
     describe("DELETE /asset/:id", ()=>{
 
         var validId;
-        var dbFind;
+        var dbFindByIdAndDelete;
+        var dbFindOne;
+        var userFind;
 
         beforeEach(()=>{
 
             validId=jest.spyOn(ObjectId,"isValid");
 
-            dbFind=jest.spyOn(Asset,"findByIdAndDelete");
+            dbFindByIdAndDelete=jest.spyOn(Asset,"findByIdAndDelete");
 
-            dbFind.mockImplementation((query, callback)=>{
+            dbFindOne=jest.spyOn(Asset,"findOne");
+
+            var user=[{
+                id:"id1",
+                name:"User1",
+                email:"user1@example.com",
+                profilePicture: null,
+                deleted:false
+            }]
+
+            userFind=jest.spyOn(User,"find");
+            userFind.mockImplementation(()=>{
+                return user;
+            })
+
+            dbFindByIdAndDelete.mockImplementation((query, callback)=>{
                 callback(null, true)
             });
 
@@ -651,31 +654,51 @@ describe("Upload service API", ()=>{
            })
         });
 
-        // it("Should delete asset with concrete id", () =>{
+        it("Should delete asset with concrete id", () =>{
 
-        //     validId.mockImplementation(() => {
-        //         return true
-        //     });
+            validId.mockImplementation(() => {
+                return true
+            });
 
-        //     dbFind.mockImplementation((query, callback)=>{
-        //         callback(false, true)
-        //     });
+            dbFind.mockImplementation((query, callback)=>{
+                callback(false, true)
+            });
+
+            var asset={
+                id:"61d19b24c6fd0e9a4357dfcf",
+                user:"id1",
+                file:"asdsadsa"
+            }
+
+            dbFindOne.mockImplementation(()=>{
+                return asset;
+            })
             
-        //    return request(app).delete("/api/v1/asset/user/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-        //         expect(response.statusCode).toBe(204);
-        //    })
-        // });
+           return request(app).delete("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
+                expect(response.statusCode).toBe(204);
+           })
+        });
 
-        // it("Should return 500 if there is a problem with the db", () =>{
+        it("Should return 500 if there is a problem with the db", () =>{
 
-        //     dbFind.mockImplementation((query, callback)=>{
-        //         callback(true, null)
-        //     });
+            var asset={
+                id:"61d19b24c6fd0e9a4357dfcf",
+                user:"id1",
+                file:"asdsadsa"
+            }
+
+            dbFindOne.mockImplementation(()=>{
+                return asset;
+            })
+
+            dbFindByIdAndDelete.mockImplementation((query,callback)=>{
+                callback(true, null)
+            });
             
-        //    return request(app).delete("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
-        //         expect(response.statusCode).toBe(500);
-        //     })
-        // });
+           return request(app).delete("/api/v1/asset/61d19b24c6fd0e9a4357dfcf").set("Authorization",`Bearer `+ process.env.SAMPLE_JWT).then((response)=>{
+                expect(response.statusCode).toBe(500);
+            })
+        });
     })
 })
 
