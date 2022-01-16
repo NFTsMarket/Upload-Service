@@ -68,15 +68,18 @@ class Subscriptions {
                console.log("Internal server error");
               }
           else if(user){
+            Asset.find({user: id}, async function(error, assets) {
               Asset.deleteMany({user: id}, async function(err, doc) {
                 if(doc.deletedCount==0){
                     console.log("An asset with that user could not be found.");
                 }else{
-                  const deletedAsset = {"id": doc._id};
-                  await pubSubController.sendMessageDeleteAsset(deletedAsset);
+                  for (asset in assets){
+                    const deletedAsset = {"id": assets[asset]._id.toString()};
+                    await pubSubController.sendMessageDeleteAsset(deletedAsset);
+                  }
                 }
               });
-              
+            });
           }else{
               console.log("An user with that id could not be found.");
           }
