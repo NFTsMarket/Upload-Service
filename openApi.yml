@@ -94,7 +94,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/createModifyAsset"
+              $ref: "#/components/schemas/modifyAsset"
       responses:
         '200':
           description: Everything is OK
@@ -184,7 +184,16 @@ components:
       properties:
         file:
           type: string
-          description: Asset's URL stored in Google Photos
+          description: Image that the user wants to upload converted to base64
+        name:
+          type: string
+          description: Asset's name
+        user:
+          type: string
+          description: User that owns the asset
+    modifyAsset:
+      type: object
+      properties:
         name:
           type: string
           description: Asset's name
