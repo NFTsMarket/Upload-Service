@@ -17,10 +17,11 @@ class Subscriptions {
   }
 
   initialize() {
-      createSubscription("created-user", "upload-service").catch(console.error);
+      // createSubscription("updated-purchase", "upload-service").catch(console.error);
   }
 
   execute() {
+    //====================== AUHT SERVICE =================
      // On Created user
      this.pubsub
      .subscription("upload-created-user")
@@ -87,6 +88,30 @@ class Subscriptions {
 
          message.ack();
      });
+
+      //====================== CATALOG SERVICE =================
+    //  // On changed user
+    //  this.pubsub
+    //  .subscription("upload-updated-purchase")
+    //  .on("message", async (message) => {
+    //      console.log("Receiving...");
+    //      console.log(JSON.parse(message.data.toString()));
+    //      const user = JSON.parse(message.data.toString());
+         
+    //     try{
+    //       var filter = { _id: req.params.id };
+    //       Asset.findOneAndUpdate(filter, req.body, function (err, doc) {
+    //         if (!doc) {
+    //             console.log("An asset with that id could not be found.");
+    //         }
+    //     });
+
+    //     }catch(e){
+    //       console.log(e);
+    //     }
+
+    //      message.ack();
+    //  });
   }
 }
 

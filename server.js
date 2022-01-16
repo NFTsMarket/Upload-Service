@@ -71,7 +71,7 @@ app.post(BASE_API_PATH + "/asset", [authorizedClient], async (req, res) => {
                     };
                     var asset = await Asset.create(asset);
                     res.setHeader('Location', '/asset/' + asset._id);
-                    await pubSubController.sendMessageCreatedAsset(req);
+                    await pubSubController.sendMessageCreatedAsset(asset,googlePhotosResponse.newMediaItemResults[0].mediaItem.id);
                     return res.status(StatusCodes.CREATED).json(asset);
                 });
             } else {
@@ -157,14 +157,18 @@ app.put(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
 
             if (user[0].id == payload.id || payload.role == "admin") {
                 var filter = { _id: req.params.id };
-                Asset.findOneAndUpdate(filter, req.body, function (err, doc) {
+                if(req.body.file){
+                    delete req.body["file"];
+                }
+                Asset.findOneAndUpdate(filter, req.body, async function (err, doc) {
                     if (!doc) {
                         return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
+                    }else{
+                        await pubSubController.sendMessageUpdateAsset(doc);
                     }
                 });
                 var asset = await Asset.findOne(filter);
                 if (asset) {
-                    await pubSubController.sendMessageUpdateAsset(req);
                     return res.status(StatusCodes.OK).json(asset);
                 } else {
                     return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
@@ -228,7 +232,8 @@ app.delete(BASE_API_PATH + "/asset/:id", authorizedClient, async (req, res) => {
                     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
                 }
                 else if (asset) {
-                    await pubSubController.sendMessageDeleteAsset(req);
+                    const deletedAsset = {"id": req.params.id};
+                    await pubSubController.sendMessageDeleteAsset(deletedAsset);
                     return res.status(StatusCodes.NO_CONTENT).json();
                 } else {
                     return res.status(StatusCodes.NOT_FOUND).json("An asset with that id could not be found.");
