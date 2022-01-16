@@ -64,6 +64,7 @@ app.post(BASE_API_PATH + "/asset", [authorizedClient], async (req, res) => {
             if (user[0].id == payload.id || payload.role == "admin") {
                 var token = await googlePhotos.get_access_token_using_saved_refresh_token();
                 await googlePhotos.createAsset(token, req.body, async function(googlePhotosResponse,err){
+                    if(err) return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
                     var asset = {
                         file: googlePhotosResponse.newMediaItemResults[0].mediaItem.id,
                         name: req.body.name,
